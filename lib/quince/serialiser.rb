@@ -32,9 +32,7 @@ module Quince
             obj = obj.call # is there a more efficient way of doing this?
             serialise(obj)
           when String
-            res = obj.gsub "
-", "
-"
+            res = obj.gsub "\n", '\n'
             res.gsub! ?", '\"'
             res
           else
