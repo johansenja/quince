@@ -128,20 +128,20 @@ Or install it yourself as:
 - All HTML attributes are available, and are the same as they would be in a regular html document, eg. `onclick` rather than `onClick` - **with the exception of a `Class`, `Max`, `Min`, `Method`** - which start with capital letters to avoid clashes with some internal methods.
 - Type checking is available at runtime for a component's `State` and `Props`, and is done in accordance with [Typed Struct](https://github.com/johansenja/typed_struct)
 - Children can be specified in one of two places, depending on what you would prefer:
-    -  as positional arguments
-    ```ruby
-    div(
-        h1("hello world")
-    )
-    ```
     -  as a block argument, to maintain similar readability with real html elements, where attributes come first
-    ```ruby
-    div(id: :my_div, style: "color: red") { h1("Single child") }
-    div(id: "div2", style: "color: green") {[
-        h2("multiple"),
-        h3("children")
-    ]}
-    ```
+        ```ruby
+        div(id: :my_div, style: "color: red") { h1("Single child") }
+        div(id: "div2", style: "color: green") {[
+            h2("multiple"),
+            h3("children")
+        ]}
+        ```
+    -  as positional arguments (for convenience and cleanliness when no props are passed)
+        ```ruby
+        div(
+            h1("hello world")
+        )
+        ```
 - A component's `render` method should always return a single top level element, ie. if you wanted to return 2 elements you should wrap them in a `div`
 
 ## Development
