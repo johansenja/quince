@@ -2,7 +2,7 @@
 
 ### What is Quince?
 
-Quince is an opinionated framework for building dynamic yet fully server-rendered web apps, with little to no JavaScript.  
+Quince is an opinionated framework for building dynamic yet fully server-rendered web apps, with little to no JavaScript.
 
 ### Inspired by
 
@@ -11,6 +11,12 @@ React, Turbo, Hotwire amongst others
 ### Current status
 
 Proof of concept, but [working in production](https://quince-rb.herokuapp.com/), and with decent performance despite few optimisations at this stage
+
+### How it works
+
+- Define some components and `expose` them at certain routes
+- Define some interactions that can take place, which can change the state of the components, and are handled with ruby methods
+- The front end will swap out the updated components with new HTML re-rendered by the back end
 
 ## Minimal 'hello world' example
 
