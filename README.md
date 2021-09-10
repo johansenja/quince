@@ -73,6 +73,10 @@ end
 class Counter < Quince::Component
     State(val: Integer)
     
+    self.initial_state = {
+        val: 0,
+    }
+    
     exposed def increment
         state.val += 1
     end
