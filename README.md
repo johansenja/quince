@@ -1,15 +1,106 @@
 # Quince
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/quince`. To experiment with that code, run `bin/console` for an interactive prompt.
+### What is Quince?
 
-TODO: Delete this and the text above, and describe your gem
+Quince is an opinionated framework for building dynamic yet fully server-rendered web apps, with little to no JavaScript.  
+
+### Inspired by
+
+React, Turbo, Hotwire amongst others
+
+### Current status
+
+Proof of concept, but [working in production](https://quince-rb.herokuapp.com/), and with decent performance despite few optimisations at this stage
+
+## Minimal 'hello world' example
+
+```ruby
+# app.rb
+require "quince_sinatra"
+
+class App < Quince::Component
+    def render
+      html(
+        head,
+        body("hello world")
+      )
+    end
+end
+
+expose App, at: "/"
+```
+
+- Run it via
+```sh
+ruby app.rb
+```
+
+- Visit `localhost:4567/`!
+
+## More complex example
+
+```ruby
+require 'quince_sinatra'
+
+class App < Quince::Component
+    def render
+      Layout(title: "First app") {[
+        Counter()
+      ]}
+    end
+end
+
+class Layout < Quince::Component
+  Props(title: String)
+  
+  def render
+      html(
+        head,
+        body(
+            h1(props.title),
+            children
+        )
+      )
+  end
+end
+
+class Counter < Quince::Component
+    State(val: Integer)
+    
+    exposed def increment
+        state.val += 1
+    end
+    
+    exposed def decrement
+        state.val -= 1
+    end
+    
+    def render
+        div(
+            h2("count is #{state.val}"),
+            button(onclick: method(:increment)) { "++" },
+            button(onclick: method(:decrement)) { "--" }
+        )
+    end
+end
+
+expose App, at: "/"
+```
+
+#### See https://github.com/johansenja/quince-demo and https://quince-rb.herokuapp.com/ for more
 
 ## Installation
 
-Add this line to your application's Gemfile:
+Quince itself is framework agnostic, so you should use an adaptor which plugs it into an existing framework for handling basic server needs
+
+### Install it via adapters
+
+- [Sinatra](https://github.com/johansenja/quince_sinatra)
+
+Pick one, and add it to your application's Gemfile, eg:
 
 ```ruby
-gem 'quince'
+gem 'quince_sinatra'
 ```
 
 And then execute:
@@ -18,11 +109,14 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install quince
+    $ gem install quince_sinatra
 
-## Usage
 
-TODO: Write usage instructions here
+## Things to note
+
+- All HTML tags are available via a method of the same name, eg. `div()`, `section()`, `span()` - **with the exception of `para` standing in for `p` to avoid clashes with Ruby's common `Kernel#p` method**
+- All HTML attributes are available, and are the same as they would be in a regular html document, eg. `onclick` rather than `onClick` - **with the exception of a `Class`, `Max`, `Min`, `Method`** - which start with capital letters to avoid clashes with some internal methods.
+- Type checking is available at runtime for a component's `State` and `Props`, and is done in accordance with [Typed Struct](https://github.com/johansenja/typed_struct)
 
 ## Development
 
@@ -32,7 +126,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/quince.
+Bug reports and pull requests are welcome on GitHub at https://github.com/johansenja/quince.
 
 ## License
 
