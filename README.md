@@ -138,6 +138,7 @@ Or install it yourself as:
         h3("children")
     ]}
     ```
+- A component's `render` method should always return a single top level element, ie. if you wanted to return 2 elements you should wrap them in a `div`
 
 ## Development
 
