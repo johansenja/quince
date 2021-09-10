@@ -118,11 +118,26 @@ Or install it yourself as:
     $ gem install quince_sinatra
 
 
-## Things to note
+## Usage notes
 
 - All HTML tags are available via a method of the same name, eg. `div()`, `section()`, `span()` - **with the exception of `para` standing in for `p` to avoid clashes with Ruby's common `Kernel#p` method**
 - All HTML attributes are available, and are the same as they would be in a regular html document, eg. `onclick` rather than `onClick` - **with the exception of a `Class`, `Max`, `Min`, `Method`** - which start with capital letters to avoid clashes with some internal methods.
 - Type checking is available at runtime for a component's `State` and `Props`, and is done in accordance with [Typed Struct](https://github.com/johansenja/typed_struct)
+- Children can be specified in one of two places, depending on what you would prefer:
+    -  as positional arguments
+    ```ruby
+    div(
+        h1("hello world")
+    )
+    ```
+    -  as a block argument, to maintain similar readability with real html elements, where attributes come first
+    ```ruby
+    div(id: :my_div, style: "color: red") { h1("Single child") }
+    div(id: "div2", style: "color: green") {[
+        h2("multiple"),
+        h3("children")
+    ]}
+    ```
 
 ## Development
 
