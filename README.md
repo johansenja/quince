@@ -61,7 +61,9 @@ class Layout < Quince::Component
   
   def render
       html(
-        head,
+        head(
+            internal_scripts
+        ),
         body(
             h1(props.title),
             children
@@ -98,6 +100,48 @@ expose App, at: "/"
 ```
 
 #### See https://github.com/johansenja/quince-demo and https://quince-rb.herokuapp.com/ for more
+
+## Why Quince?
+
+### Why not?
+
+- You have pre-existing APIs which you want to integrate a front end with
+- You want to share the back end API with a different service
+- You want more offline functionality
+- You need a super complex/custom front end
+
+### Why?
+
+- Lightweight 🪶
+    - Very few dependencies
+    - Just a couple hundred lines of core logic
+    - Fewer than 30 lines (unminified) of JavaScript in the front end
+- Plug and play into multiple back ends 🔌
+- Components > templates 🧩
+    - Write html-like elements, but with strong typo resistence 
+    - no special syntax or compilation required
+- Shallow learning curve if you are already familiar with React 📈
+- Just worry about your core business logic and how the app looks 🧪
+    - No need to worry about
+        - routes
+        - controllers
+        - front end -> back end communication/APIs/Data transfer
+        - front end -> back end code sharing
+    - Quince handles these for you
+- No node_modules 📦
+    - No yarn/npm
+    - Minimise bundle size concerns
+    - Manage your dependencies just using bundler & rubygems
+    - Make use of other pre-built Quince components via rubygems
+- Get full use of Ruby's rich and comprehensive standard library 💎
+- Take advantage of Ruby's ability to wrap native libraries (eg. gems using C) ⚡️
+- Fully server-rendered responses 📡
+    - Single source of truth for your app's code (no code-sharing needed)
+    - Better SEO out the box
+    - Know exactly what your user is seeing
+        - Tracking a user's activity on the front end has become a big deal, especially in heavily front-end driven apps/SPAs, in order to be able to see how a user is actually using the app (ie. to track how the state has been changing on the front end)
+        - This normally requires cookies and a premium third party service
+        - But if everything a user sees is generated server-side, it would be easy to reconstruct a user's journey and their state changes
 
 ## Installation
 
