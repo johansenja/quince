@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    quince (0.1.2)
+    quince (0.2.0)
       oj (~> 3.13)
       typed_struct (>= 0.1.4)
 
@@ -9,7 +9,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     diff-lcs (1.4.4)
-    oj (3.13.5)
+    oj (3.13.6)
     rake (13.0.6)
     rbs (1.6.2)
     rspec (3.10.0)

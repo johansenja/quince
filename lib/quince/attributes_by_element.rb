@@ -16,6 +16,7 @@ module Quince
 
     ATTRIBUTES_BY_ELEMENT = {
       "A" => {
+        # download: t::Any,
         href: opt_string_sym,
         hreflang: opt_string_sym,
         media: opt_string_sym,
@@ -336,7 +337,7 @@ module Quince
       "Area" => {
         alt: opt_string_sym,
         coords: opt_string_sym,
-        download: t::Any,
+        # download: t::Any,
         href: opt_string_sym,
         hreflang: opt_string_sym,
         media: opt_string_sym,

@@ -58,7 +58,7 @@ end
 
 class Layout < Quince::Component
   Props(title: String)
-  
+
   def render
       html(
         head(
@@ -74,19 +74,21 @@ end
 
 class Counter < Quince::Component
     State(val: Integer)
-    
-    self.initial_state = {
-        val: 0,
-    }
-    
+
+    def initialize
+      @state = State.new(
+          val: params.fetch(:val, 0),
+      )
+    end
+
     exposed def increment
         state.val += 1
     end
-    
+
     exposed def decrement
         state.val -= 1
     end
-    
+
     def render
         div(
             h2("count is #{state.val}"),
@@ -118,7 +120,7 @@ expose App, at: "/"
     - Fewer than 30 lines (unminified) of JavaScript in the front end
 - Plug and play into multiple back ends 🔌
 - Components > templates 🧩
-    - Write html-like elements, but with strong typo resistence 
+    - Write html-like elements, but with strong typo resistence
     - no special syntax or compilation required
 - Shallow learning curve if you are already familiar with React 📈
 - Just worry about your core business logic and how the app looks 🧪
