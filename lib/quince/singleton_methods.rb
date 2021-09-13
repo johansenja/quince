@@ -10,21 +10,23 @@ module Quince
     def middleware=(middleware)
       @middleware = middleware
       Object.define_method(:expose) do |component, at:|
-        component = component.new if component.instance_of? Class
-
         Quince.middleware.create_route_handler(
           verb: :GET,
           route: at,
-          component: component,
-        )
+        ) do |params|
+          component = component.create if component.instance_of? Class
+          Quince::Component.class_variable_set :@@params, params
+          component
+        end
       end
+      Object.send :private, :expose
     end
 
     def define_constructor(const, constructor_name = const.to_s)
       HtmlTagComponents.instance_eval do
         define_method(constructor_name) do |*children, **props, &block_children|
           new_props = { **props, Quince::Component::HTML_SELECTOR_ATTR => __id }
-          const.new(*children, **new_props, &block_children)
+          const.create(*children, **new_props, &block_children)
         end
       end
     end

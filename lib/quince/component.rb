@@ -30,12 +30,9 @@ module Quince
           route: route,
         ) do |params|
           instance = Quince::Serialiser.deserialise params[:component]
+          Quince::Component.class_variable_set :@@params, params
           if @exposed_actions.member? action
-            if instance.method(action).arity.zero?
-              instance.send action
-            else
-              instance.send action, params[:params]
-            end
+            instance.send action
             instance
           else
             raise "The action you called is not exposed"
@@ -45,11 +42,15 @@ module Quince
         route
       end
 
-      def initial_state=(attrs)
-        @initial_state ||= self::State.new(**attrs)
+      def create(*children, **props, &block_children)
+        allocate.tap do |instance|
+          id = SecureRandom.alphanumeric 6
+          instance.instance_variable_set :@__id, id
+          instance.instance_variable_set :@props, initialize_props(self, id, **props)
+          instance.instance_variable_set(:@children, block_children || children)
+          instance.send :initialize
+        end
       end
-
-      attr_reader :initial_state
 
       private
 
@@ -58,14 +59,10 @@ module Quince
       end
     end
 
-    attr_reader :props, :state, :children
+    # set default
+    @@params = {}
 
-    def initialize(*children, **props, &block_children)
-      @__id = SecureRandom.alphanumeric(6)
-      @props = self.class.send :initialize_props, self.class, @__id, **props
-      @state = self.class.initial_state
-      @children = block_children || children
-    end
+    attr_reader :props, :state, :children
 
     def render
       raise "not implemented"
@@ -75,6 +72,10 @@ module Quince
 
     def to(route, via: :POST)
       self.class.exposed route, meth0d: via
+    end
+
+    def params
+      @@params
     end
 
     private
