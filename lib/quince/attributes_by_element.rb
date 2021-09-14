@@ -11,7 +11,7 @@ module Quince
     t = Quince::Types
     opt_string_sym = Rbs("#{t::OptionalString} | Symbol")
     opt_bool = t::OptionalBoolean
-    opt_method = Rbs("Method | Quince::Types::Undefined")
+    opt_callback = Rbs("Quince::Callback::Base | Quince::Types::Undefined")
     value = opt_string_sym # for now
 
     ATTRIBUTES_BY_ELEMENT = {
@@ -468,13 +468,13 @@ module Quince
     }.freeze
 
     DOM_EVENTS = {
-      onclick: opt_method,
-      onsubmit: opt_method,
-      onblur: opt_method,
-      onchange: opt_method,
-      onsearch: opt_method,
-      onkeyup: opt_method,
-      onselect: opt_method,
+      onclick: opt_callback,
+      onsubmit: opt_callback,
+      onblur: opt_callback,
+      onchange: opt_callback,
+      onsearch: opt_callback,
+      onkeyup: opt_callback,
+      onselect: opt_callback,
     }.freeze
   end
 end

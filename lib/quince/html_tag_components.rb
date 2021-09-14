@@ -53,6 +53,8 @@ module Quince
                 end
                 CGI.escape_html(ev)
               end
+            when Callback::Base
+              value.render
             when true
               return key
             when false, nil, Quince::Types::Undefined

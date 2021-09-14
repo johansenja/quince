@@ -1,3 +1,5 @@
+require_relative "callback"
+
 module Quince
   class Component
     class << self
@@ -29,7 +31,7 @@ module Quince
           verb: meth0d,
           route: route,
         ) do |params|
-          instance = Quince::Serialiser.deserialise params[:component]
+          instance = Quince::Serialiser.deserialise(CGI.unescapeHTML(params[:component]))
           Quince::Component.class_variable_set :@@params, params
           if @exposed_actions.member? action
             instance.send action
@@ -47,7 +49,8 @@ module Quince
           id = SecureRandom.alphanumeric 6
           instance.instance_variable_set :@__id, id
           instance.instance_variable_set :@props, initialize_props(self, id, **props)
-          instance.instance_variable_set(:@children, block_children || children)
+          kids = block_children ? block_children.call : children
+          instance.instance_variable_set(:@children, kids)
           instance.send :initialize
         end
       end
@@ -58,6 +61,8 @@ module Quince
         const::Props.new(HTML_SELECTOR_ATTR => id, **props) if const.const_defined?("Props")
       end
     end
+
+    include Callback::ComponentHelpers
 
     # set default
     @@params = {}
@@ -82,7 +87,7 @@ module Quince
 
     attr_reader :__id
 
-    HTML_SELECTOR_ATTR = :"data-respid"
+    HTML_SELECTOR_ATTR = :"data-quid"
 
     def html_element_selector
       "[#{HTML_SELECTOR_ATTR}='#{__id}']".freeze
