@@ -45,10 +45,13 @@ module Quince
                 CGI.escape_html(
                   "callRemoteEndpoint(`/api/#{owner}/#{name}`,`#{payload}`,`#{selector}`)"
                 )
-              when :onsubmit
-                CGI.escape_html(
-                  "const p = #{payload}; callRemoteEndpoint( `/api/#{owner}/#{name}`, JSON.stringify({...p, params: getFormValues(this)}), `#{selector}`); return false"
-                )
+              when :onsubmit, :onchange, :onblur, :onsearch, :onkeyup, :onselect
+                ev = "const p = #{payload}; callRemoteEndpoint( `/api/#{owner}/#{name}`, JSON.stringify({...p, params: getFormValues(this)}), `#{selector}`)"
+                case key
+                when :onsubmit
+                  ev += "; return false"
+                end
+                CGI.escape_html(ev)
               end
             when true
               return key

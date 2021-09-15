@@ -18,7 +18,11 @@ const callRemoteEndpoint = (endpoint, payload, selector) => {
   })
 }
 
-const getFormValues = (form) => {
+const getFormValues = (elem) => {
+  let form = elem.localName === "form" ? elem : elem.form;
+  if (!form) {
+    throw `element ${elem} should belong to a form`;
+  }
   const fd = new FormData(form);
   return Object.fromEntries(fd.entries());
 }

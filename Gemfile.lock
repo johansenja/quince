@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    quince (0.2.0)
+    quince (0.2.1)
       oj (~> 3.13)
       typed_struct (>= 0.1.4)
 
