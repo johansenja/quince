@@ -92,8 +92,8 @@ class Counter < Quince::Component
     def render
         div(
             h2("count is #{state.val}"),
-            button(onclick: method(:increment)) { "++" },
-            button(onclick: method(:decrement)) { "--" }
+            button(onclick: callback(:increment)) { "++" },
+            button(onclick: callback(:decrement)) { "--" }
         )
     end
 end
