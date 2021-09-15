@@ -11,7 +11,7 @@ module Quince
     t = Quince::Types
     opt_string_sym = Rbs("#{t::OptionalString} | Symbol")
     opt_bool = t::OptionalBoolean
-    opt_callback = Rbs("Quince::Callback::Base | Quince::Types::Undefined")
+    opt_callback = Rbs("Quince::Callback::Interface | Quince::Types::Undefined")
     value = opt_string_sym # for now
 
     ATTRIBUTES_BY_ELEMENT = {

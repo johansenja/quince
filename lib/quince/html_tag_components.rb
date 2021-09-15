@@ -33,28 +33,22 @@ module Quince
           attrib = case value
             when String, Integer, Float, Symbol
               value.to_s
-            when Method
-              owner = value.owner
+            when Callback::Interface
               receiver = value.receiver
-              name = value.name
+              owner = receiver.class.name
+              name = value.method_name
               selector = receiver.send :html_element_selector
               internal = Quince::Serialiser.serialise receiver
-              payload = { component: internal }.to_json
-              case key
-              when :onclick
-                CGI.escape_html(
-                  "callRemoteEndpoint(`/api/#{owner}/#{name}`,`#{payload}`,`#{selector}`)"
-                )
-              when :onsubmit, :onchange, :onblur, :onsearch, :onkeyup, :onselect
-                ev = "const p = #{payload}; callRemoteEndpoint( `/api/#{owner}/#{name}`, JSON.stringify({...p, params: getFormValues(this)}), `#{selector}`)"
-                case key
-                when :onsubmit
-                  ev += "; return false"
+              payload = { component: CGI.escapeHTML(internal) }.to_json
+              payload_var_name = "p"
+              stringify_payload = if value.take_form_values
+                  "{...#{payload_var_name}, params: getFormValues(this)}"
+                else
+                  payload_var_name
                 end
-                CGI.escape_html(ev)
-              end
-            when Callback::Base
-              value.render
+              cb = %Q{const #{payload_var_name} = #{payload}; callRemoteEndpoint(`/api/#{owner}/#{name}`, JSON.stringify(#{stringify_payload}),`#{selector}`)}
+              cb += ";return false" if value.prevent_default
+              CGI.escape_html(cb)
             when true
               return key
             when false, nil, Quince::Types::Undefined

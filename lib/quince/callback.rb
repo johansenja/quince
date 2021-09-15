@@ -1,45 +1,36 @@
 module Quince
-  module Callback
+  class Callback
     module ComponentHelpers
       protected
 
-      def callback(method_name)
+      DEFAULT_CALLBACK_OPTIONS = {
+        prevent_default: false,
+        take_form_values: false,
+      # others could include:
+      # debounce: false,
+      }.freeze
+
+      def callback(method_name, **opts)
         unless self.class.instance_variable_get(:@exposed_actions).member?(method_name)
           raise "The action you called is not exposed"
         end
 
-        Callback::Base.new(self, method_name)
+        opts = DEFAULT_CALLBACK_OPTIONS.merge opts
+
+        Callback.new(self, method_name, **opts)
       end
     end
 
-    class Base
-      attr_reader :receiver, :method_name
-
-      def initialize(receiver, method_name)
-        @receiver, @method_name = receiver, method_name
-      end
-
-      def render
-        owner = receiver.class.name
-        selector = receiver.send :html_element_selector
-        internal = Quince::Serialiser.serialise(receiver)
-        payload = { component: CGI.escapeHTML(internal) }.to_json
-        CGI.escapeHTML(
-          %Q{const p = #{payload}; callRemoteEndpoint(`/api/#{owner}/#{method_name}`, JSON.stringify(p),`#{selector}`)},
-        )
-      end
+    module Interface
+      attr_reader :receiver, :method_name, :prevent_default, :take_form_values
     end
 
-    class WithFormValues < Base
-      def render
-        owner = receiver.class.name
-        selector = receiver.send :html_element_selector
-        internal = Quince::Serialiser.serialise(receiver)
-        payload = { component: CGI.escapeHTML(internal) }.to_json
-        CGI.escapeHTML(
-          "const p = #{payload}; callRemoteEndpoint(`/api/#{owner}/#{method_name}`, JSON.stringify({...p, params: getFormValues(this)}), `#{selector}`); return false",
-        )
-      end
+    include Interface
+
+    def initialize(receiver, method_name, prevent_default:, take_form_values:)
+      @receiver, @method_name = receiver, method_name
+      @prevent_default = prevent_default
+      @take_form_values = take_form_values
     end
   end
 end
