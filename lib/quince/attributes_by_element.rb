@@ -470,6 +470,11 @@ module Quince
     DOM_EVENTS = {
       onclick: opt_method,
       onsubmit: opt_method,
+      onblur: opt_method,
+      onchange: opt_method,
+      onsearch: opt_method,
+      onkeyup: opt_method,
+      onselect: opt_method,
     }.freeze
   end
 end
