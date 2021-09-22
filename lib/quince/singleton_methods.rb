@@ -16,6 +16,7 @@ module Quince
         ) do |params|
           component = component.create if component.instance_of? Class
           Quince::Component.class_variable_set :@@params, params
+          component.instance_variable_set :@render_with, :render
           component
         end
       end
@@ -44,12 +45,15 @@ module Quince
           output = to_html(output.call)
         when NilClass
           output = ""
-        else
+        when Component
           tmp = output
-          output = output.render
-          if output.is_a?(Array)
+          render_with = output.instance_variable_get(:@render_with) || :render
+          output = output.send render_with
+          if output.is_a?(Array) && render_with == :render
             raise "#render in #{tmp.class} should not return multiple elements. Consider wrapping it in a div"
           end
+        else
+          raise "don't know how to render #{output.class} (#{output.inspect})"
         end
       end
 

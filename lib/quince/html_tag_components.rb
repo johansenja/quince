@@ -1,9 +1,13 @@
 require "oj"
 require_relative "attributes_by_element"
 require_relative "serialiser"
+require "erb"
 
 module Quince
   module HtmlTagComponents
+    CALLBACK_TEMPLATE = File.read(File.join(__dir__, "callback.js.erb")).delete!("\n").freeze
+    CALLBACK_ERB_INSTANCE = ERB.new(CALLBACK_TEMPLATE)
+
     def self.define_html_tag_component(const_name, attrs, self_closing: false)
       klass = Class.new(Quince::Component) do
         Props(
@@ -37,18 +41,15 @@ module Quince
               receiver = value.receiver
               owner = receiver.class.name
               name = value.method_name
+              endpoint = "/api/#{owner}/#{name}"
               selector = receiver.send :html_element_selector
               internal = Quince::Serialiser.serialise receiver
               payload = { component: CGI.escapeHTML(internal) }.to_json
               payload_var_name = "p"
-              stringify_payload = if value.take_form_values
-                  "{...#{payload_var_name}, params: getFormValues(this)}"
-                else
-                  payload_var_name
-                end
-              cb = %Q{const #{payload_var_name} = #{payload}; callRemoteEndpoint(`/api/#{owner}/#{name}`, JSON.stringify(#{stringify_payload}),`#{selector}`)}
-              cb += ";return false" if value.prevent_default
-              CGI.escape_html(cb)
+              fn_name = "_Q_#{key}_#{receiver.send(:__id)}"
+              rerender = value.rerender
+              code = CALLBACK_ERB_INSTANCE.result(binding)
+              CGI.escape_html(code)
             when true
               return key
             when false, nil, Quince::Types::Undefined

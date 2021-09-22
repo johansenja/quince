@@ -1,28 +1,64 @@
-const callRemoteEndpoint = (endpoint, payload, selector) => {
-  fetch(
-    endpoint,
-    {
-      method: `POST`,
-      headers: {
-        "Content-Type": `application/json;charset=utf-8`
-      },
-      body: payload,
-    }
-  ).then(resp => resp.text()).then(html => {
-    const element = document.querySelector(selector);
-    if (!element) {
-      throw `element not found for ${selector}`;
-    }
+const Q = {
+  c: (endpoint, payload, selector, mode = "replace") => {
+    return fetch(
+      endpoint,
+      {
+        method: `POST`,
+        headers: {
+          "Content-Type": `application/json;charset=utf-8`
+        },
+        body: payload,
+      }
+    ).then(resp => resp.text()).then(html => {
+      const element = document.querySelector(selector);
+      if (!element) {
+        throw `element not found for ${selector}`;
+      }
 
-    element.outerHTML = html
-  })
-}
+      switch (mode) {
+        case "append_diff":
+          const tmpElem = document.createElement(element.nodeName);
+          tmpElem.innerHTML = html;
+          const newNodes = Array.from(tmpElem.childNodes);
+          const existingChildren = element.childNodes;
+          let c = 0;
+          for (; c < existingChildren.length; c++) {
+            if (existingChildren[c].isEqualNode(newNodes[c]))
+              continue;
+            else
+              break;
+          }
+          for (const node of newNodes.slice(c)) {
+            element.appendChild(node);
+          }
+          break;
+        case "replace": 
+          element.outerHTML = html;
+          break;
+        default:
+          throw `mode ${mode} is not valid`;
+      }
+    })
+  },
+  f: (elem) => {
+    let form = elem.localName === "form" ? elem : elem.form;
+    if (!form) {
+      throw `element ${elem} should belong to a form`;
+    }
+    const fd = new FormData(form);
+    return Object.fromEntries(fd.entries());
+  },
+  d: (func, wait_ms) => {
+    let timer = null;
 
-const getFormValues = (elem) => {
-  let form = elem.localName === "form" ? elem : elem.form;
-  if (!form) {
-    throw `element ${elem} should belong to a form`;
-  }
-  const fd = new FormData(form);
-  return Object.fromEntries(fd.entries());
-}
+    return (...args) => {
+      clearTimeout(timer);
+      return new Promise((resolve) => {
+        timer = setTimeout(
+          () => resolve(func(...args)),
+          wait_ms,
+        );
+      });
+    };
+  },
+};

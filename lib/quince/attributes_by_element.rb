@@ -475,6 +475,7 @@ module Quince
       onsearch: opt_callback,
       onkeyup: opt_callback,
       onselect: opt_callback,
+      onscroll: opt_callback,
     }.freeze
   end
 end

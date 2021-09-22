@@ -1,0 +1,30 @@
+const <%= payload_var_name %> = <%= payload %>;
+<% if value.debugger %>debugger;<% end %>
+<% if value.if %>
+if (<%= value.if %>) {
+<% end %>
+<% if value.debounce_ms %>
+if (!window[`<%= fn_name %>`]) window[`<%= fn_name %>`] = Q.d((<%= payload_var_name %>) => {
+<% end %>
+Q.c(
+`<%= endpoint %>`,
+JSON.stringify(
+{...<%= payload_var_name %>,
+<% if value.take_form_values %>
+params: Q.f(this),
+<% end %>
+<% if rerender %>
+rerender: <%= rerender.to_json %>,
+<% end %>}),
+`<%= rerender&.dig(:selector)&.to_s || selector %>`,
+<% if mode = rerender&.dig(:mode) %>`<%= mode.to_s %>`<% end %>
+);
+<% if value.debounce_ms&.positive? %>
+}, <%= value.debounce_ms %>); window[`<%= fn_name %>`](<%= payload_var_name %>)
+<% end %>
+<% if value.if %>
+};
+<% end %>
+<% if value.prevent_default %>
+;return false;
+<% end %>

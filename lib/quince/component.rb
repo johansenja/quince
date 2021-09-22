@@ -23,16 +23,22 @@ module Quince
         self.const_set "State", st
       end
 
-      def exposed(action, meth0d: :POST)
+      def exposed(action, method: :POST)
         @exposed_actions ||= Set.new
         @exposed_actions.add action
         route = "/api/#{self.name}/#{action}"
         Quince.middleware.create_route_handler(
-          verb: meth0d,
+          verb: method,
           route: route,
         ) do |params|
           instance = Quince::Serialiser.deserialise(CGI.unescapeHTML(params[:component]))
           Quince::Component.class_variable_set :@@params, params
+          render_with = if params[:rerender]
+                          params[:rerender][:method].to_sym
+                        else
+                          :render
+                        end
+          instance.instance_variable_set :@render_with, render_with
           if @exposed_actions.member? action
             instance.send action
             instance
@@ -76,7 +82,7 @@ module Quince
     protected
 
     def to(route, via: :POST)
-      self.class.exposed route, meth0d: via
+      self.class.exposed route, method: via
     end
 
     def params
