@@ -17,7 +17,8 @@ params: Q.f(this),
 rerender: <%= rerender.to_json %>,
 <% end %>}),
 `<%= rerender&.dig(:selector)&.to_s || selector %>`,
-<% if mode = rerender&.dig(:mode) %>`<%= mode.to_s %>`<% end %>
+`<%= (mode = rerender&.dig(:mode)) ? mode.to_s : "replace" %>`,
+<%= value.handle_errors.to_json %>,
 );
 <% unless push_params_state == "null" %>Q.ps(<%= push_params_state %>);<% end %>
 <% if value.debounce_ms&.positive? %>

@@ -92,6 +92,34 @@ module Quince
         contents
       }
     end
+
+    ERROR_HANDLING_STYLES = <<~CSS.freeze
+      .quince-err-container {
+        position: absolute;
+        bottom: 32px;
+        width: 300px;
+        height: 50px;
+        background-color: white;
+        border-radius: 4px;
+        border: 1px solid #bbb;
+        z-index: 999;
+        box-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+        padding: 0 24px;
+        left: calc(50vw - 50px);
+      }
+
+      .quince-err-msg {
+        font-size: 1.2em;
+        text-align: center;
+        margin: auto;
+        color: chocolate;
+      }
+    CSS
+    private_constant :ERROR_HANDLING_STYLES
+
+    def error_message_styles
+      style(ERROR_HANDLING_STYLES)
+    end
   end
 
   Quince::Component.include HtmlTagComponents

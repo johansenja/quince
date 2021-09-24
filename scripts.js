@@ -1,5 +1,5 @@
 const Q = {
-  c: (endpoint, payload, selector, mode = "replace") => {
+  c: (endpoint, payload, selector, mode, handleErrors) => {
     return fetch(
       endpoint,
       {
@@ -9,7 +9,19 @@ const Q = {
         },
         body: payload,
       }
-    ).then(resp => resp.text()).then(html => {
+    ).then(resp => {
+      if (resp.status <= 299) {
+        return resp.text()
+      } else if (resp.status >= 500) {
+        throw Q.em["500"];
+      } else {
+        let msg = Q.em[`${resp.code}`];
+        
+        if (!msg && resp.code >= 400) msg = Q.em.generic;
+        
+        throw msg;
+      }
+    }).then(html => {
       const element = document.querySelector(selector);
       if (!element) {
         throw `element not found for ${selector}`;
@@ -49,6 +61,20 @@ const Q = {
         default:
           throw `mode ${mode} is not valid`;
       }
+    }).catch(err => {
+      if (!handleErrors) throw err;
+
+      let msg;
+      if (typeof err === "string") {
+        msg = err;
+      } else if (err.message) {
+        if (err.message.startsWith("NetworkError")) {
+          msg = Q.em.network;
+        } else {
+          msg = err.message;
+        }
+      } else msg = Q.em.generic;
+      Q.e(msg, 2500);
     })
   },
   f: (elem) => {
@@ -79,5 +105,29 @@ const Q = {
       url.searchParams.append(p, stateObj[p]);
     };
     window.history.pushState({}, document.title, url);
+  },
+  e: (msg, durationMs) => {
+    const containerClassName = "quince-err-container";
+    document.querySelectorAll(`.${containerClassName}`).forEach(e => e.remove());
+    const container = document.createElement("div");
+    const strong = document.createElement("strong");
+    strong.innerText = msg;
+    container.className = containerClassName;
+    strong.className = "quince-err-msg";
+    container.appendChild(strong);
+    document.body.insertAdjacentElement("afterbegin", container);
+    setTimeout(() => container.remove(), durationMs);
+  },
+  em: {
+    400: "Bad request",
+    401: "Unauthorised",
+    402: "Payment required",
+    403: "Forbidden",
+    404: "Not found",
+    422: "Unprocessable entity",
+    429: "Too many requests",
+    500: "Internal server error",
+    generic: "An error occurred",
+    network: "Network error", 
   }
 };
