@@ -21,9 +21,12 @@ module Quince
               props.each_pair.map { |k, v| to_html_attr(k, v) }.compact.join(" ")
             end
           result = "<#{tag_name}"
-          result << " #{attrs}>" unless attrs.empty?
-
-          return result if self_closing?
+          if !attrs.empty?
+            result << " #{attrs}>"
+            return result if self_closing?
+          elsif attrs.empty? && self_closing?
+            return result << ">"
+          end
 
           result << Quince.to_html(children)
           result << "</#{tag_name}>"
@@ -42,18 +45,17 @@ module Quince
               owner = receiver.class.name
               name = value.method_name
               endpoint = "/api/#{owner}/#{name}"
-              selector = receiver.send :html_element_selector
+              selector = receiver.send :html_parent_selector
               internal = Quince::Serialiser.serialise receiver
-              payload = { component: CGI.escapeHTML(internal) }.to_json
-              payload_var_name = "p"
               fn_name = "_Q_#{key}_#{receiver.send(:__id)}"
               rerender = value.rerender
+              state_container = html_self_selector
               code = CALLBACK_ERB_INSTANCE.result(binding)
-              CGI.escape_html(code)
+              return %Q{#{key}="#{CGI.escape_html(code)}" data-qu-#{key}-state="#{CGI.escapeHTML(internal)}"}
             when true
               return key
             when false, nil, Quince::Types::Undefined
-              return ""
+              return nil
             else
               raise "prop type not yet implemented #{value}"
             end

@@ -10,7 +10,8 @@ module Quince
       def Props(**kw)
         self.const_set "Props", TypedStruct.new(
           { default: Quince::Types::Undefined },
-          Quince::Component::HTML_SELECTOR_ATTR => String,
+          Quince::Component::PARENT_SELECTOR_ATTR => String,
+          Quince::Component::SELF_SELECTOR => String,
           **kw,
         )
       end
@@ -34,11 +35,13 @@ module Quince
           instance = Quince::Serialiser.deserialise(CGI.unescapeHTML(params[:component]))
           Quince::Component.class_variable_set :@@params, params
           render_with = if params[:rerender]
+                          instance.instance_variable_set :@state_container, params[:stateContainer]
                           params[:rerender][:method].to_sym
                         else
                           :render
                         end
           instance.instance_variable_set :@render_with, render_with
+          instance.instance_variable_set :@callback_event, params[:event]
           if @exposed_actions.member? action
             instance.send action
             instance
@@ -64,7 +67,9 @@ module Quince
       private
 
       def initialize_props(const, id, **props)
-        const::Props.new(HTML_SELECTOR_ATTR => id, **props) if const.const_defined?("Props")
+        if const.const_defined?("Props")
+          const::Props.new(PARENT_SELECTOR_ATTR => id, **props, SELF_SELECTOR => id)
+        end
       end
     end
 
@@ -93,10 +98,15 @@ module Quince
 
     attr_reader :__id
 
-    HTML_SELECTOR_ATTR = :"data-quid"
+    PARENT_SELECTOR_ATTR = :"data-quid-parent"
+    SELF_SELECTOR = :"data-quid"
 
-    def html_element_selector
-      "[#{HTML_SELECTOR_ATTR}='#{__id}']".freeze
+    def html_parent_selector
+      "[#{PARENT_SELECTOR_ATTR}='#{__id}']".freeze
+    end
+
+    def html_self_selector
+      "[#{SELF_SELECTOR}='#{props[SELF_SELECTOR]}']".freeze
     end
   end
 end
