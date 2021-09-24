@@ -1,0 +1,30 @@
+const p = this.dataset[`quOn<%= key.to_s[2..-1] %>State`];
+<% if value.debugger %>debugger;<% end %>
+<% if value.if %>
+if (<%= value.if %>) {
+<% end %>
+<% if value.debounce_ms %>
+if (!window[`<%= fn_name %>`]) window[`<%= fn_name %>`] = Q.d((p) => {
+<% end %>
+Q.c(
+`<%= endpoint %>`,
+JSON.stringify(
+{component: p, event: `<%= key.to_s[2..-1]  %>`,stateContainer: `<%= state_container %>`,
+<% if value.take_form_values %>
+params: Q.f(this),
+<% end %>
+<% if rerender %>
+rerender: <%= rerender.to_json %>,
+<% end %>}),
+`<%= rerender&.dig(:selector)&.to_s || selector %>`,
+<% if mode = rerender&.dig(:mode) %>`<%= mode.to_s %>`<% end %>
+);
+<% if value.debounce_ms&.positive? %>
+}, <%= value.debounce_ms %>); window[`<%= fn_name %>`](p)
+<% end %>
+<% if value.if %>
+};
+<% end %>
+<% if value.prevent_default %>
+;return false;
+<% end %>

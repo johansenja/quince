@@ -16,6 +16,7 @@ module Quince
         ) do |params|
           component = component.create if component.instance_of? Class
           Quince::Component.class_variable_set :@@params, params
+          component.instance_variable_set :@render_with, :render
           component
         end
       end
@@ -25,7 +26,7 @@ module Quince
     def define_constructor(const, constructor_name = const.to_s)
       HtmlTagComponents.instance_eval do
         define_method(constructor_name) do |*children, **props, &block_children|
-          new_props = { **props, Quince::Component::HTML_SELECTOR_ATTR => __id }
+          new_props = { **props, Quince::Component::PARENT_SELECTOR_ATTR => __id }
           const.create(*children, **new_props, &block_children)
         end
       end
@@ -44,12 +45,30 @@ module Quince
           output = to_html(output.call)
         when NilClass
           output = ""
-        else
+        when Component
           tmp = output
-          output = output.render
-          if output.is_a?(Array)
-            raise "#render in #{tmp.class} should not return multiple elements. Consider wrapping it in a div"
+          render_with = output.instance_variable_get(:@render_with) || :render
+          output = output.send render_with
+          case render_with
+          when :render
+            if output.is_a?(Array)
+              raise "#render in #{tmp.class} should not return multiple elements. Consider wrapping it in a div"
+            end
+          else
+            internal = Quince::Serialiser.serialise tmp
+            updated_state = CGI.escapeHTML(internal).to_json
+            selector = tmp.instance_variable_get :@state_container
+            event = tmp.instance_variable_get :@callback_event
+
+            scr = to_html(HtmlTagComponents::Script.create(<<~JS, type: "text/javascript"))
+              var stateContainer = document.querySelector(`#{selector}`);
+              stateContainer.dataset.quOn#{event}State = #{updated_state};
+            JS
+
+            output += (output.is_a?(String) ? scr : [scr])
           end
+        else
+          raise "don't know how to render #{output.class} (#{output.inspect})"
         end
       end
 

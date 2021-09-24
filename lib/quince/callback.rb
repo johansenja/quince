@@ -6,8 +6,10 @@ module Quince
       DEFAULT_CALLBACK_OPTIONS = {
         prevent_default: false,
         take_form_values: false,
-      # others could include:
-      # debounce: false,
+        debounce_ms: nil,
+        if: nil,
+        debugger: false,
+        rerender: nil,
       }.freeze
 
       def callback(method_name, **opts)
@@ -22,15 +24,24 @@ module Quince
     end
 
     module Interface
-      attr_reader :receiver, :method_name, :prevent_default, :take_form_values
+      attr_reader(
+        :receiver,
+        :method_name,
+        *ComponentHelpers::DEFAULT_CALLBACK_OPTIONS.keys,
+      )
     end
 
     include Interface
 
-    def initialize(receiver, method_name, prevent_default:, take_form_values:)
+    def initialize(
+      receiver,
+      method_name,
+      **opts
+    )
       @receiver, @method_name = receiver, method_name
-      @prevent_default = prevent_default
-      @take_form_values = take_form_values
+      ComponentHelpers::DEFAULT_CALLBACK_OPTIONS.each_key do |opt|
+        instance_variable_set :"@#{opt}", opts.fetch(opt)
+      end
     end
   end
 end
