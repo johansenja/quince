@@ -10,6 +10,7 @@ module Quince
         if: nil,
         debugger: false,
         rerender: nil,
+        push_params_state: nil,
       }.freeze
 
       def callback(method_name, **opts)

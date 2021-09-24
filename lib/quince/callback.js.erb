@@ -19,6 +19,7 @@ rerender: <%= rerender.to_json %>,
 `<%= rerender&.dig(:selector)&.to_s || selector %>`,
 <% if mode = rerender&.dig(:mode) %>`<%= mode.to_s %>`<% end %>
 );
+<% unless push_params_state == "null" %>Q.ps(<%= push_params_state %>);<% end %>
 <% if value.debounce_ms&.positive? %>
 }, <%= value.debounce_ms %>); window[`<%= fn_name %>`](p)
 <% end %>

@@ -72,4 +72,12 @@ const Q = {
       });
     };
   },
+  ps: (stateObj) => {
+    const base = location.origin + location.pathname;
+    const url = new URL(base);
+    for (const p in stateObj) {
+      url.searchParams.append(p, stateObj[p]);
+    };
+    window.history.pushState({}, document.title, url);
+  }
 };

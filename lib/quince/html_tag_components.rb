@@ -50,6 +50,7 @@ module Quince
               fn_name = "_Q_#{key}_#{receiver.send(:__id)}"
               rerender = value.rerender
               state_container = html_self_selector
+              push_params_state = value.push_params_state.to_json
               code = CALLBACK_ERB_INSTANCE.result(binding)
               return %Q{#{key}="#{CGI.escape_html(code)}" data-qu-#{key}-state="#{CGI.escapeHTML(internal)}"}
             when true
