@@ -1,3 +1,4 @@
+require "forwardable"
 require_relative "callback"
 
 module Quince
@@ -27,15 +28,17 @@ module Quince
         Quince.middleware.create_route_handler(
           verb: method,
           route: route,
-        ) do |params|
+        ) do |bind|
+          Thread.current[:request_binding] = bind
+          params = bind.receiver.params
+          Thread.current[:params] = params[:params] || {}
           instance = Quince::Serialiser.deserialise(CGI.unescapeHTML(params[:component]))
-          Quince::Component.class_variable_set :@@params, params[:params]
-          render_with = if params[:rerender]
-              instance.instance_variable_set :@state_container, params[:stateContainer]
-              params[:rerender][:method].to_sym
-            else
-              :render
-            end
+          if params[:rerender]
+            instance.instance_variable_set :@state_container, params[:stateContainer]
+            render_with = params[:rerender][:method].to_sym
+          else
+            render_with = :render
+          end
           instance.instance_variable_set :@render_with, render_with
           instance.instance_variable_set :@callback_event, params[:event]
           if @exposed_actions.member? action
@@ -73,10 +76,8 @@ module Quince
       end
     end
 
+    extend Forwardable
     include Callback::ComponentHelpers
-
-    # set default
-    @@params = {}
 
     attr_reader :props, :state, :children
 
@@ -91,8 +92,14 @@ module Quince
     end
 
     def params
-      @@params
+      Thread.current[:params]
     end
+
+    def request_context
+      Thread.current[:request_binding].receiver
+    end
+
+    def_delegators :request_context, :attachment, :request, :response, :redirect, :halt
 
     private
 

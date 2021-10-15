@@ -11,7 +11,12 @@ const Q = {
       }
     ).then(resp => {
       if (resp.status <= 299) {
-        return resp.text()
+        const cd = resp.headers.get("Content-Disposition");
+        if (cd && cd.trim().startsWith("attachment")) {
+         return resp.blob(); 
+        } else {
+          return resp.text();
+        }
       } else if (resp.status >= 500) {
         throw Q.em["500"];
       } else {
@@ -21,45 +26,46 @@ const Q = {
         
         throw msg;
       }
-    }).then(html => {
-      const element = document.querySelector(selector);
-      if (!element) {
-        throw `element not found for ${selector}`;
-      }
-
-      switch (mode) {
-        case "append_diff":
-          const tmpElem = document.createElement(element.nodeName);
-          tmpElem.innerHTML = html;
-          const newNodes = Array.from(tmpElem.childNodes);
-          const script = newNodes.pop();
-          const existingChildren = element.childNodes;
-          // This comparison doesn't currently work because of each node's unique id (data-quid).
-          // maybe it would be possible to use regex replace to on the raw html, but it could also
-          // be overkill
-          // let c = 0;
-          // for (; c < existingChildren.length; c++) {
-          //   if (existingChildren[c].isEqualNode(newNodes[c]))
-          //     continue;
-          //   else
-          //     break;
-          // }
-          // for the time being, we can just assume that we can just take the extra items
-          let c = existingChildren.length;
-          for (const node of newNodes.slice(c)) {
-            element.appendChild(node);
+    }).then(data => {
+      switch (true) {
+        case data instanceof Blob:
+          const url = URL.createObjectURL(data);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = "download";
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          break;
+        default: // html
+          const element = document.querySelector(selector);
+          if (!element) {
+            throw `element not found for ${selector}`;
           }
 
-          const newScript = document.createElement("script");
-          newScript.dataset.quid = script.dataset.quid;
-          newScript.innerHTML = script.innerHTML;
-          document.head.appendChild(newScript);
-          break;
-        case "replace": 
-          element.outerHTML = html;
-          break;
-        default:
-          throw `mode ${mode} is not valid`;
+          switch (mode) {
+            case "append_diff":
+              const tmpElem = document.createElement(element.nodeName);
+              tmpElem.innerHTML = data;
+              const newNodes = Array.from(tmpElem.childNodes);
+              const script = newNodes.pop();
+              const existingChildren = element.childNodes;
+              let c = existingChildren.length;
+              for (const node of newNodes.slice(c)) {
+                element.appendChild(node);
+              }
+
+              const newScript = document.createElement("script");
+              newScript.dataset.quid = script.dataset.quid;
+              newScript.innerHTML = script.innerHTML;
+              document.head.appendChild(newScript);
+              break;
+            case "replace": 
+              element.outerHTML = data;
+              break;
+            default:
+              throw `mode ${mode} is not valid`;
+          }
       }
     }).catch(err => {
       if (!handleErrors) throw err;

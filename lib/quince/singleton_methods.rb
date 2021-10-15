@@ -13,11 +13,12 @@ module Quince
         Quince.middleware.create_route_handler(
           verb: :GET,
           route: at,
-        ) do |params|
-          component = component.create if component.instance_of? Class
-          Quince::Component.class_variable_set :@@params, params
-          component.instance_variable_set :@render_with, :render
-          component
+        ) do |bind|
+          Thread.current[:request_binding] = bind
+          Thread.current[:params] = bind.receiver.params
+          comp = component.instance_of?(Class) ? component.create : component
+          comp.instance_variable_set :@render_with, :render
+          comp
         end
       end
       Object.send :private, :expose
