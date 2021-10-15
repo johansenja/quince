@@ -67,7 +67,7 @@ module Quince
           const::Props.new(
             PARENT_SELECTOR_ATTR => id,
             **props,
-            SELF_SELECTOR => id
+            SELF_SELECTOR => id,
           )
         end
       end
@@ -102,12 +102,11 @@ module Quince
     SELF_SELECTOR = :"data-quid"
 
     def html_parent_selector
-      id = props ? props[SELF_SELECTOR] : __id
-      "[#{PARENT_SELECTOR_ATTR}='#{id}']".freeze
+      "[#{PARENT_SELECTOR_ATTR}='#{__id}']".freeze
     end
 
     def html_self_selector
-      "[#{SELF_SELECTOR}='#{__id}']".freeze
+      "[#{SELF_SELECTOR}='#{props[SELF_SELECTOR]}']".freeze
     end
   end
 end

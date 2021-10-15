@@ -80,7 +80,6 @@ module Quince
 
             scr = to_html(HtmlTagComponents::Script.create(<<~JS, type: "text/javascript"))
               var stateContainer = document.querySelector(`#{selector}`);
-              console.log('yes');
               stateContainer.dataset.quOn#{event}State = #{updated_state};
             JS
             output = output.render if output.is_a?(Component)
