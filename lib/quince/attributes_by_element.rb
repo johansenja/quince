@@ -4,14 +4,14 @@ require_relative "types"
 
 module Quince
   module HtmlTagComponents
-    referrer_policy = Rbs("'' | 'no-referrer' | 'no-referrer-when-downgrade' | 'origin' | 'origin-when-cross-origin' | 'same-origin' | 'strict-origin' | 'strict-origin-when-cross-origin' | 'unsafe-url' | Quince::Types::Undefined")
+    referrer_policy = Rbs("'' | 'no-referrer' | 'no-referrer-when-downgrade' | 'origin' | 'origin-when-cross-origin' | 'same-origin' | 'strict-origin' | 'strict-origin-when-cross-origin' | 'unsafe-url' | nil")
     form_method = Rbs(
-      '"get" | "post" | "GET" | "POST" | :GET | :POST | :get | :post | Quince::Types::Undefined'
+      '"get" | "post" | "GET" | "POST" | :GET | :POST | :get | :post | nil'
     )
     t = Quince::Types
     opt_string_sym = Rbs("#{t::OptionalString} | Symbol")
     opt_bool = t::OptionalBoolean
-    opt_callback = Rbs("Quince::Callback::Interface | Quince::Types::Undefined")
+    opt_callback = Rbs("Quince::Callback::Interface | nil")
     value = opt_string_sym # for now
 
     ATTRIBUTES_BY_ELEMENT = {
@@ -58,7 +58,7 @@ module Quince
         formnovalidate: opt_bool,
         formtarget: opt_string_sym,
         name: opt_string_sym,
-        type: Rbs("'submit' | 'reset' | 'button' | Quince::Types::Undefined"),
+        type: Rbs("'submit' | 'reset' | 'button' | nil"),
         value: value,
       }.freeze,
       "Canvas" => {
@@ -128,7 +128,7 @@ module Quince
         allowfullscreen: opt_bool,
         allowtransparency: opt_bool,
         height: opt_string_sym,
-        loading: Rbs('"eager" | "lazy" | Quince::Types::Undefined'),
+        loading: Rbs('"eager" | "lazy" | nil'),
         name: opt_string_sym,
         referrerpolicy: referrer_policy,
         sandbox: opt_string_sym,
@@ -192,7 +192,7 @@ module Quince
       "Ol" => {
         reversed: opt_bool,
         start: opt_string_sym,
-        type: Rbs("'1' | 'a' | 'A' | 'i' | 'I' | Quince::Types::Undefined"),
+        type: Rbs("'1' | 'a' | 'A' | 'i' | 'I' | nil"),
       }.freeze,
       "Optgroup" => {
         disabled: opt_bool,
@@ -270,7 +270,7 @@ module Quince
       }.freeze,
       "Tbody" => {}.freeze,
       "Td" => {
-        align: Rbs('"left" | "center" | "right" | "justify" | "char" | Quince::Types::Undefined'),
+        align: Rbs('"left" | "center" | "right" | "justify" | "char" | nil'),
         colspan: opt_string_sym,
         headers: opt_string_sym,
         rowspan: opt_string_sym,
@@ -278,7 +278,7 @@ module Quince
         abbr: opt_string_sym,
         height: opt_string_sym,
         width: opt_string_sym,
-        valign: Rbs('"top" | "middle" | "bottom" | "baseline" | Quince::Types::Undefined'),
+        valign: Rbs('"top" | "middle" | "bottom" | "baseline" | nil'),
       }.freeze,
       "Textarea" => {
         autocomplete: opt_string_sym,
@@ -300,7 +300,7 @@ module Quince
       }.freeze,
       "Tfoot" => {}.freeze,
       "Th" => {
-        align: Rbs('"left" | "center" | "right" | "justify" | "char" | Quince::Types::Undefined'),
+        align: Rbs('"left" | "center" | "right" | "justify" | "char" | nil'),
         colspan: opt_string_sym,
         headers: opt_string_sym,
         rowspan: opt_string_sym,
@@ -364,10 +364,10 @@ module Quince
       "Hr" => {}.freeze,
       "Img" => {
         alt: opt_string_sym,
-        crossorigin: Rbs('"anonymous" | "use-credentials" | "" | Quince::Types::Undefined'),
-        decoding: Rbs('"async" | "auto" | "sync" | Quince::Types::Undefined'),
+        crossorigin: Rbs('"anonymous" | "use-credentials" | "" | nil'),
+        decoding: Rbs('"async" | "auto" | "sync" | nil'),
         height: Rbs("#{opt_string_sym} | Integer"),
-        loading: Rbs('"eager" | "lazy" | Quince::Types::Undefined'),
+        loading: Rbs('"eager" | "lazy" | nil'),
         referrerpolicy: referrer_policy,
         sizes: opt_string_sym,
         src: opt_string_sym,
@@ -479,5 +479,3 @@ module Quince
     }.freeze
   end
 end
-
-Undefined = Quince::Types::Undefined

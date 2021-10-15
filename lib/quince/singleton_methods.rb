@@ -23,11 +23,29 @@ module Quince
       Object.send :private, :expose
     end
 
-    def define_constructor(const, constructor_name = const.to_s)
+    def define_constructor(const, constructor_name = nil)
+      if const.name
+        parts = const.name.split("::")
+        parent_namespace = Object.const_get(parts[0...-1].join("::")) if parts.length > 1
+        constructor_name ||= parts.last
+      end
+      constructor_name ||= const.to_s
+
       HtmlTagComponents.instance_eval do
-        define_method(constructor_name) do |*children, **props, &block_children|
-          new_props = { **props, Quince::Component::PARENT_SELECTOR_ATTR => __id }
+        mthd = lambda do |*children, **props, &block_children|
+          new_props = {
+            **props,
+            Quince::Component::PARENT_SELECTOR_ATTR => __id,
+          }
           const.create(*children, **new_props, &block_children)
+        end
+
+        if parent_namespace
+          parent_namespace.instance_exec do
+            define_method(constructor_name, &mthd)
+          end
+        else
+          define_method(constructor_name, &mthd)
         end
       end
     end
@@ -62,8 +80,10 @@ module Quince
 
             scr = to_html(HtmlTagComponents::Script.create(<<~JS, type: "text/javascript"))
               var stateContainer = document.querySelector(`#{selector}`);
+              console.log('yes');
               stateContainer.dataset.quOn#{event}State = #{updated_state};
             JS
+            output = output.render if output.is_a?(Component)
 
             output += (output.is_a?(String) ? scr : [scr])
           end
@@ -76,3 +96,10 @@ module Quince
     end
   end
 end
+
+############## TODO #############
+# I think you should be able to know when a component is the first to be called in a render method,
+# so you should be able to attach some props to it behind the scenes. Then any consumers of this
+# state just have to know the selector, so they can read from it before passing it to the back end.
+#
+# Also, the front end needs to be updated such that script tags from the back end are always read

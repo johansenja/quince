@@ -49,13 +49,13 @@ module Quince
               internal = Quince::Serialiser.serialise receiver
               fn_name = "_Q_#{key}_#{receiver.send(:__id)}"
               rerender = value.rerender
-              state_container = html_self_selector
+              state_container = selector
               push_params_state = value.push_params_state.to_json
               code = CALLBACK_ERB_INSTANCE.result(binding)
               return %Q{#{key}="#{CGI.escape_html(code)}" data-qu-#{key}-state="#{CGI.escapeHTML(internal)}"}
             when true
               return key
-            when false, nil, Quince::Types::Undefined
+            when false, nil
               return nil
             else
               raise "prop type not yet implemented #{value}"
@@ -123,11 +123,4 @@ module Quince
   end
 
   Quince::Component.include HtmlTagComponents
-end
-
-# tmp hack
-class TypedStruct < Struct
-  def to_json(*args)
-    to_h.to_json(*args)
-  end
 end
