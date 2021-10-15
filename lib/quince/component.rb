@@ -9,7 +9,6 @@ module Quince
 
       def Props(**kw)
         self.const_set "Props", TypedStruct.new(
-          { default: Quince::Types::Undefined },
           Quince::Component::PARENT_SELECTOR_ATTR => String,
           Quince::Component::SELF_SELECTOR => String,
           **kw,
@@ -17,10 +16,7 @@ module Quince
       end
 
       def State(**kw)
-        st = kw.empty? ? nil : TypedStruct.new(
-          { default: Quince::Types::Undefined },
-          **kw,
-        )
+        st = kw.empty? ? nil : TypedStruct.new(**kw)
         self.const_set "State", st
       end
 
@@ -33,13 +29,13 @@ module Quince
           route: route,
         ) do |params|
           instance = Quince::Serialiser.deserialise(CGI.unescapeHTML(params[:component]))
-          Quince::Component.class_variable_set :@@params, params
+          Quince::Component.class_variable_set :@@params, params[:params]
           render_with = if params[:rerender]
-                          instance.instance_variable_set :@state_container, params[:stateContainer]
-                          params[:rerender][:method].to_sym
-                        else
-                          :render
-                        end
+              instance.instance_variable_set :@state_container, params[:stateContainer]
+              params[:rerender][:method].to_sym
+            else
+              :render
+            end
           instance.instance_variable_set :@render_with, render_with
           instance.instance_variable_set :@callback_event, params[:event]
           if @exposed_actions.member? action
@@ -68,7 +64,11 @@ module Quince
 
       def initialize_props(const, id, **props)
         if const.const_defined?("Props")
-          const::Props.new(PARENT_SELECTOR_ATTR => id, **props, SELF_SELECTOR => id)
+          const::Props.new(
+            PARENT_SELECTOR_ATTR => id,
+            **props,
+            SELF_SELECTOR => id
+          )
         end
       end
     end
@@ -102,11 +102,12 @@ module Quince
     SELF_SELECTOR = :"data-quid"
 
     def html_parent_selector
-      "[#{PARENT_SELECTOR_ATTR}='#{__id}']".freeze
+      id = props ? props[SELF_SELECTOR] : __id
+      "[#{PARENT_SELECTOR_ATTR}='#{id}']".freeze
     end
 
     def html_self_selector
-      "[#{SELF_SELECTOR}='#{props[SELF_SELECTOR]}']".freeze
+      "[#{SELF_SELECTOR}='#{__id}']".freeze
     end
   end
 end
