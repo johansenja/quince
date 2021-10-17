@@ -99,7 +99,8 @@ module Quince
       Thread.current[:request_binding].receiver
     end
 
-    def_delegators :request_context, :attachment, :request, :response, :redirect, :halt
+    def_delegators :request_context,
+      :attachment, :request, :response, :redirect, :halt, :session, :cache_control, :send_file, :to, :status, :headers, :body
 
     private
 
