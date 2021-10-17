@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    quince (0.6.0)
+    quince (0.6.1)
       oj (~> 3.13)
       rack-contrib (~> 2.3)
       sinatra (~> 2.1)
