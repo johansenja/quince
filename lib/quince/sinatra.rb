@@ -1,25 +1,6 @@
 # frozen_string_literal: true
-
-ENV["RACK_ENV"] ||= "development"
-
-require "sinatra/base"
-require "sinatra/reloader" if ENV["RACK_ENV"] == "development"
-require "rack/contrib"
-
 module Quince
   class SinatraApp < Sinatra::Base
-    configure :development do
-      if Object.const_defined? "Sinatra::Reloader"
-        register Sinatra::Reloader
-        dont_reload __FILE__
-        also_reload $0
-      end
-    end
-    enable :logging
-    use Rack::JSONBodyParser
-    use Rack::Deflater
-    set :public_folder, File.join(File.dirname(File.expand_path($0)), "public")
-
     class << self
       def create_route_handler(verb:, route:, &blck)
         meth = case verb
