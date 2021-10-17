@@ -12,6 +12,7 @@ module Quince
         rerender: nil,
         push_params_state: nil,
         handle_errors: true,
+        download: false,
       }.freeze
 
       def callback(method_name, **opts)
@@ -29,7 +30,7 @@ module Quince
       attr_reader(
         :receiver,
         :method_name,
-        *ComponentHelpers::DEFAULT_CALLBACK_OPTIONS.keys,
+              *ComponentHelpers::DEFAULT_CALLBACK_OPTIONS.keys,
       )
     end
 
