@@ -1,15 +1,26 @@
 PATH
   remote: .
   specs:
-    quince (0.5.1)
+    quince (0.6.0)
       oj (~> 3.13)
+      rack-contrib (~> 2.3)
+      sinatra (~> 2.1)
+      sinatra-contrib (~> 2.1)
       typed_struct (>= 0.1.4)
 
 GEM
   remote: https://rubygems.org/
   specs:
     diff-lcs (1.4.4)
+    multi_json (1.15.0)
+    mustermann (1.1.1)
+      ruby2_keywords (~> 0.0.1)
     oj (3.13.9)
+    rack (2.2.3)
+    rack-contrib (2.3.0)
+      rack (~> 2.0)
+    rack-protection (2.1.0)
+      rack
     rake (13.0.6)
     rbs (1.6.2)
     rspec (3.10.0)
@@ -25,6 +36,19 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.10.0)
     rspec-support (3.10.2)
+    ruby2_keywords (0.0.5)
+    sinatra (2.1.0)
+      mustermann (~> 1.0)
+      rack (~> 2.2)
+      rack-protection (= 2.1.0)
+      tilt (~> 2.0)
+    sinatra-contrib (2.1.0)
+      multi_json
+      mustermann (~> 1.0)
+      rack-protection (= 2.1.0)
+      sinatra (= 2.1.0)
+      tilt (~> 2.0)
+    tilt (2.0.10)
     typed_struct (0.1.4)
       rbs (~> 1.0)
 
