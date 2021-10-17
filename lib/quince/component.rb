@@ -9,7 +9,7 @@ module Quince
       end
 
       def Props(**kw)
-        self.const_set "Props", TypedStruct.new(
+        self.const_set "Props", Quince::Config.props_struct_type.new(
           Quince::Component::PARENT_SELECTOR_ATTR => String,
           Quince::Component::SELF_SELECTOR => String,
           **kw,
@@ -17,7 +17,7 @@ module Quince
       end
 
       def State(**kw)
-        st = kw.empty? ? nil : TypedStruct.new(**kw)
+        st = kw.empty? ? nil : Quince::Config.state_struct_type.new(**kw)
         self.const_set "State", st
       end
 
