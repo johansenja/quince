@@ -15,6 +15,7 @@ module Quince
         also_reload $0
       end
     end
+    enable :logging
     use Rack::JSONBodyParser
     use Rack::Deflater
     set :public_folder, File.join(File.dirname(File.expand_path($0)), "public")
