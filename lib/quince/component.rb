@@ -25,7 +25,7 @@ module Quince
         @exposed_actions ||= Set.new
         @exposed_actions.add action
         route = "/api/#{self.name}/#{action}"
-        Quince.middleware.create_route_handler(
+        Quince::SinatraApp.create_route_handler(
           verb: method,
           route: route,
         ) do |bind|

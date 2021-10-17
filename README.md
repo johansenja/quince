@@ -10,7 +10,8 @@ React, Turbo, Hotwire amongst others
 
 ### Current status
 
-Proof of concept, but [working in production](https://quince-rb.herokuapp.com/), and with decent performance despite few optimisations at this stage
+Early, but [working in production](https://quince-rb.herokuapp.com/). Expect more features and
+optimisations to come, but also potential for big changes between versions in the early stages.
 
 ### How it works
 
@@ -22,7 +23,7 @@ Proof of concept, but [working in production](https://quince-rb.herokuapp.com/),
 
 ```ruby
 # app.rb
-require "quince_sinatra"
+require "quince"
 
 class App < Quince::Component
     def render
@@ -46,7 +47,7 @@ ruby app.rb
 ## More complex example
 
 ```ruby
-require 'quince_sinatra'
+require 'quince'
 
 class App < Quince::Component
     def render
@@ -114,49 +115,23 @@ expose App, at: "/"
 
 ### Why?
 
-- Lightweight 🪶
-    - Very few dependencies
-    - Just a couple hundred lines of core logic
-    - Fewer than 30 lines (unminified) of JavaScript in the front end
-- Plug and play into multiple back ends 🔌
 - Components > templates 🧩
-    - Write html-like elements, but with strong typo resistence
-    - no special syntax or compilation required
+- Lightweight 🪶
 - Shallow learning curve if you are already familiar with React 📈
-- Just worry about your core business logic and how the app looks 🧪
-    - No need to worry about
-        - routes
-        - controllers
-        - front end -> back end communication/APIs/Data transfer
-        - front end -> back end code sharing
-    - Quince handles these for you
-- No node_modules 📦
-    - No yarn/npm
-    - Minimise bundle size concerns
-    - Manage your dependencies just using bundler & rubygems
-    - Make use of other pre-built Quince components via rubygems
+- Focus on your core business logic, not routes/APIs/data transfer/code sharing 🧪
+- No compilation/node_modules/yarn/js bundle size concerns - just bundler 📦
 - Get full use of Ruby's rich and comprehensive standard library 💎
 - Take advantage of Ruby's ability to wrap native libraries (eg. gems using C) ⚡️
-- Fully server-rendered responses 📡
-    - Single source of truth for your app's code (no code-sharing needed)
-    - Better SEO out the box
-    - Know exactly what your user is seeing
-        - Tracking a user's activity on the front end has become a big deal, especially in heavily front-end driven apps/SPAs, in order to be able to see how a user is actually using the app (ie. to track how the state has been changing on the front end)
-        - This normally requires cookies and a premium third party service
-        - But if everything a user sees is generated server-side, it would be easy to reconstruct a user's journey and their state changes
+- Fully server-rendered responses - single source of truth 📡
+- Easy to recreate/rehydrate a pages state (almost nothing is stored in memory from JavaScript - all
+  the state is stored with the HTML document's markup)
 
 ## Installation
 
-Quince itself is framework agnostic, so you should use an adaptor which plugs it into an existing framework for handling basic server needs
-
-### Install it via adapters
-
-- [Sinatra](https://github.com/johansenja/quince_sinatra)
-
-Pick one, and add it to your application's Gemfile, eg:
+Add this to your application's Gemfile:
 
 ```ruby
-gem 'quince_sinatra'
+gem 'quince'
 ```
 
 And then execute:
@@ -165,7 +140,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install quince_sinatra
+    $ gem install quince
 
 
 ## Usage notes

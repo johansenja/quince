@@ -1,29 +1,5 @@
 module Quince
   class << self
-    attr_reader :middleware
-    attr_accessor :underlying_app
-
-    def optional_string
-      @optional_string ||= Rbs("String?")
-    end
-
-    def middleware=(middleware)
-      @middleware = middleware
-      Object.define_method(:expose) do |component, at:|
-        Quince.middleware.create_route_handler(
-          verb: :GET,
-          route: at,
-        ) do |bind|
-          Thread.current[:request_binding] = bind
-          Thread.current[:params] = bind.receiver.params
-          comp = component.instance_of?(Class) ? component.create : component
-          comp.instance_variable_set :@render_with, :render
-          comp
-        end
-      end
-      Object.send :private, :expose
-    end
-
     def define_constructor(const, constructor_name = nil)
       if const.name
         parts = const.name.split("::")
